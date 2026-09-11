@@ -1,0 +1,56 @@
+##rest request blocks
+
+### sign up only
+POST http://localhost:3000/signup
+Content-Type: application/json
+
+{
+    "email" : "test2@gmail.com",
+    "password" : "secret12344"
+}
+
+### login
+# @name login
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email" : "test@gmail.com",
+    "password" : "secret1234"
+}
+
+### /me who am i?
+GET http://localhost:3000/me
+Authorization: Bearer {{login.response.body.token}}
+
+
+###
+# @name application
+POST http://localhost:3000/applications
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+    "company" : "alvinclub",
+    "role" : "fullstack",
+    "status" : "pending",
+    "notes": "testnote"
+}
+
+### get applications based on userId
+GET http://localhost:3000/applications
+Authorization : Bearer {{login.response.body.token}}
+
+### patch application status
+PATCH http://localhost:3000/applications/{{application.response.body.id}}
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+    "status" : "interviewing"
+}
+
+### delete applicaiton
+DELETE http://localhost:3000/applications/{{application.response.body.id}}
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}

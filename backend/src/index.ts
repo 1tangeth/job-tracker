@@ -2,8 +2,9 @@ import express from "express"; // default export
 import cors from "cors";
 import { db } from "./db";
 import jwt from "jsonwebtoken"
-import bycrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { requireAuth } from "./auth";
+import { applicationRouter } from "./controllers.ts/applicationController";
 import "dotenv/config";
 
 const app = express();
@@ -22,14 +23,14 @@ app.get("/hello", (req, res) => {
 })
 
 
-app.get("/login", async (req, res) => {
+app.post("/login", async (req, res) => {
     const {email, password} = req.body;
     const user = await db.user.findUnique({where : {email}});
 
     if (!user)
         return res.status(401).json({error : "user not found"});
 
-    const valid = await bycrypt.compare(password, user.passwordHash);
+    const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid)
         return res.status(401).json({error : "invalid passward"});
     const token = jwt.sign({userId: user.id}, process.env.JWT_SECRET as string, {expiresIn: "7d"});
@@ -40,11 +41,10 @@ app.get("/login", async (req, res) => {
 app.post("/signup", async(req ,res) => {
     const{email, password} = req.body;
     if (!email || !password)
-        return res.status(401).json({error : "invalid input"});
+        return res.status(400).json({error : "invalid input"});
     if (password.length < 8) 
-        return res.status(401).json({error : "enter at least 8 characters"});
-    
-    const passwordHash = await bycrypt.hash(password, 10);
+        return res.status(400).json({error : "enter at least 8 characters"});
+    const passwordHash = await bcrypt.hash(password, 10);
     const user = await db.user.create({
         data : {email, passwordHash},
     });
@@ -52,7 +52,20 @@ app.post("/signup", async(req ,res) => {
 
 })
 
+// testing my login and signup
+app.get("/me", requireAuth, async(req, res) => {
+    const userId = (req as any).userId;
+    const user = await db.user.findUnique({
+        where : {id : userId},
+        select: {id : true, email : true, createdAt: true},
+    });
+    res.json()
 
+})
+
+app.use(applicationRouter);
+
+// set up PORT
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

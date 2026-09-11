@@ -10,6 +10,7 @@ export function requireAuth (req: Request, res : Response, next:NextFunction) {
     
     const token = header.replace("Bearer ", "");    
     try {
+        // extracted ID because i got token from header -> get userId -> put into request
         const verify = jwt.verify(token, process.env.JWT_SECRET as string) as {userId : string};
         (req as any).userId = verify.userId;
         next();
