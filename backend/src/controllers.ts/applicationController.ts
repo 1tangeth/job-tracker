@@ -12,6 +12,7 @@ applicationRouter.post("/applications", requireAuth, async(req, res) =>{
     const application = await db.application.create({
         data: {userId, company, role, status, notes}
     })
+    // return application id by default?
     res.json(application);
 })
 
