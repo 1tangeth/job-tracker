@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs";
 import { requireAuth } from "./auth";
 import { applicationRouter } from "./controllers.ts/applicationController";
+import { Prisma } from "./generated/prisma/client";
 import "dotenv/config";
 
 const app = express();
@@ -59,11 +60,20 @@ app.get("/me", requireAuth, async(req, res) => {
         where : {id : userId},
         select: {id : true, email : true, createdAt: true},
     });
-    res.json()
+    res.json(user);
 
 })
 
 app.use(applicationRouter);
+
+// error handling middleware: must be registered last, after all routes
+app.use((err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.log(err);
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+        return res.status(409).json({ error: "Email already in use" });
+    }
+    res.status(500).json({ error: "Something went wrong" });
+});
 
 // set up PORT
 app.listen(PORT, () => {

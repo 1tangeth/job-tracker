@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FormField from '../components/FormField';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,7 +23,11 @@ function ApplicationPage() {
 
     const [appError, setAppError] = useState("");
     const navigate = useNavigate();
-
+    
+    useEffect(() => {
+        if (!token)
+            navigate("/signin")
+    } , []); // [] means only run once for this page
 
     async function submitApp() {
         const response = await fetch("http://localhost:3000/applications", {

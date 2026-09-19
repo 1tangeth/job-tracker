@@ -56,6 +56,9 @@ applicationRouter.patch("/applications/:id", requireAuth, async(req, res) => {
 applicationRouter.delete("/applications/:id", requireAuth, async(req, res) => {
     const userId = (req as any).userId;
     const {id} = req.params;
-    await db.application.deleteMany ({where : {id : id as string, userId}});
+    const result = await db.application.deleteMany ({where : {id : id as string, userId}});
+    if (result.count === 0) {
+        return res.status(404).json({error : "no applications matching id"});
+    }
     res.status(204).send();
 })
