@@ -9,6 +9,9 @@ function ApplicationPage() {
     const [role, setRole] = useState("");
     const [status, setStatus] = useState("");
     const [notes, setNotes] = useState("");
+    const [jobText, setJobText] = useState("");
+    const [parsing, setParsing] = useState(false);
+
     const token = localStorage.getItem("token");
 
 
@@ -96,6 +99,35 @@ function ApplicationPage() {
         await getApp();
     }
 
+    async function parseJob() {
+        setParsing(true);
+        const response = await fetch(`http://localhost:3000/parse-job`, {
+            method: "POST",
+            headers: {
+                "Content-Type" : "application/json",
+                "Authorization" : `Bearer ${token}`,
+            },
+            body: 
+                JSON.stringify({
+                    text: jobText
+                })
+        });
+        
+        const data = await response.json();
+        if (!response.ok) {
+            setAppError(data.error || "Something went wrong");
+            setParsing(false);
+            return;
+        }  
+
+
+        setCompany(data.company);
+        setRole(data.role);
+        setStatus(data.status);
+        setNotes(data.notes);
+        setParsing(false);
+    }
+
 
     return (
         <> 
@@ -126,9 +158,16 @@ function ApplicationPage() {
                   <option value="rejected">rejected</option>
                 </select>
               </li>
-
             ))}
           </ul>
+
+          <textarea value={jobText} onChange={(e) => setJobText(e.target.value)} placeholder="Paste job posting here..." />
+            {!parsing && (
+                <button onClick={parseJob}>Parse with AI</button>
+            )}
+
+
+
         </>
       )}
 

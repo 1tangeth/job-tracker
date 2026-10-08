@@ -54,3 +54,14 @@ Authorization: Bearer {{login.response.body.token}}
 DELETE http://localhost:3000/applications/{{application.response.body.id}}
 Content-Type: application/json
 Authorization: Bearer {{login.response.body.token}}
+
+
+### openAPI call
+# @name parseJob
+POST http://localhost:3000/parse-job
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+    "text": "Acme Corp is hiring a Senior Backend Engineer to build scalable APIs using Node.js and PostgreSQL. 5+ years experience required."
+}

@@ -4,9 +4,10 @@ import { db } from "./db";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs";
 import { requireAuth } from "./auth";
-import { applicationRouter } from "./controllers.ts/applicationController";
+import { applicationRouter } from "./controllers/applicationController";
 import { Prisma } from "./generated/prisma/client";
 import "dotenv/config";
+import { openaiRouter } from "./controllers/openaiController";
 
 const app = express();
 const PORT = 3000;
@@ -65,6 +66,7 @@ app.get("/me", requireAuth, async(req, res) => {
 })
 
 app.use(applicationRouter);
+app.use(openaiRouter)
 
 // error handling middleware: must be registered last, after all routes
 app.use((err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
