@@ -8,6 +8,7 @@ import { applicationRouter } from "./controllers/applicationController";
 import { Prisma } from "./generated/prisma/client";
 import "dotenv/config";
 import { openaiRouter } from "./controllers/openaiController";
+import { jobRouter } from "./controllers/jobController";
 
 const app = express();
 const PORT = 3000;
@@ -66,7 +67,8 @@ app.get("/me", requireAuth, async(req, res) => {
 })
 
 app.use(applicationRouter);
-app.use(openaiRouter)
+app.use(openaiRouter);
+app.use(jobRouter);
 
 // error handling middleware: must be registered last, after all routes
 app.use((err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {

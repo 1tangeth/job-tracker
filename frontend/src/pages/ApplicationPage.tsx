@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import FormField from '../components/FormField';
 import { useNavigate } from 'react-router-dom';
 
+type job = {id:string, company: string, position : string , url : string , tags: string[]};
+
 function ApplicationPage() {
 
     const [company, setCompany] = useState("");
@@ -11,6 +13,7 @@ function ApplicationPage() {
     const [notes, setNotes] = useState("");
     const [jobText, setJobText] = useState("");
     const [parsing, setParsing] = useState(false);
+    const [jobs, setJobs] = useState<job[]> ([]);
 
     const token = localStorage.getItem("token");
 
@@ -128,6 +131,18 @@ function ApplicationPage() {
         setParsing(false);
     }
 
+    async function getJobs() {
+        setParsing(true);
+        const response = await fetch(`http://localhost:3000/jobs` , {
+            method: "GET",
+            headers : {
+                "Authorization" : `Bearer ${token}`,
+            },
+        });
+        const data = await response.json();
+        setJobs(data);
+    }
+
 
     return (
         <> 
@@ -165,6 +180,16 @@ function ApplicationPage() {
             {!parsing && (
                 <button onClick={parseJob}>Parse with AI</button>
             )}
+
+            <button onClick={getJobs}>Browse Jobs</button>
+            <ul>
+            {jobs.map((job) => (
+                <li key={job.id}>
+                <strong>{job.company}</strong> — {job.position}{" "}
+                <a href={job.url} target="_blank" rel="noopener noreferrer">view</a>
+                </li>
+            ))}
+            </ul>
 
 
 

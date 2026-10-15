@@ -65,3 +65,9 @@ Authorization: Bearer {{login.response.body.token}}
 {
     "text": "Acme Corp is hiring a Senior Backend Engineer to build scalable APIs using Node.js and PostgreSQL. 5+ years experience required."
 }
+
+
+### jobposting get
+# @name getJob
+GET http://localhost:3000/jobs
+Authorization: Bearer {{login.response.body.token}}
