@@ -13,6 +13,7 @@ function ApplicationPage() {
     const [notes, setNotes] = useState("");
     const [jobText, setJobText] = useState("");
     const [parsing, setParsing] = useState(false);
+    const [parsingJob, setParsingJob] = useState(false);
     const [jobs, setJobs] = useState<job[]> ([]);
 
     const token = localStorage.getItem("token");
@@ -132,7 +133,7 @@ function ApplicationPage() {
     }
 
     async function getJobs() {
-        setParsing(true);
+        setParsingJob(true);
         const response = await fetch(`http://localhost:3000/jobs` , {
             method: "GET",
             headers : {
@@ -141,6 +142,7 @@ function ApplicationPage() {
         });
         const data = await response.json();
         setJobs(data);
+        setParsingJob(false);
     }
 
 
@@ -180,12 +182,20 @@ function ApplicationPage() {
             {!parsing && (
                 <button onClick={parseJob}>Parse with AI</button>
             )}
-
-            <button onClick={getJobs}>Browse Jobs</button>
+            {!parsingJob && (
+                <button onClick={getJobs}>Browse Jobs</button>
+            )}
+            
             <ul>
             {jobs.map((job) => (
                 <li key={job.id}>
                 <strong>{job.company}</strong> — {job.position}{" "}
+                <button onClick = {() => {
+                    setCompany(job.company);
+                    setRole(job.position);
+                    setStatus("applied");
+                    setNotes(job.tags.join(", ")); // [python, backend, senior] => "python, backend,"
+                }} > Fill Form</button>{" "};
                 <a href={job.url} target="_blank" rel="noopener noreferrer">view</a>
                 </li>
             ))}

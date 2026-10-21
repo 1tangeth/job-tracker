@@ -60,11 +60,22 @@ app.get("/me", requireAuth, async(req, res) => {
     const userId = (req as any).userId;
     const user = await db.user.findUnique({
         where : {id : userId},
-        select: {id : true, email : true, createdAt: true},
+        select: {id : true, email : true, createdAt: true, resumeText : true},
     });
     res.json(user);
 
 })
+
+app.patch("/me", requireAuth, async(req, res) => {
+    const userId = (req as any).userId;
+    const { resumeText } = req.body;
+    const user = await db.user.update({
+        where: { id: userId },
+        data: { resumeText },
+        select: { id: true, email: true, resumeText: true },
+    });
+    res.json(user);
+});
 
 app.use(applicationRouter);
 app.use(openaiRouter);

@@ -1,19 +1,24 @@
 import OpenAI from "openai";
 import {Router} from "express"
-
+import { db } from "../db";
 import { requireAuth } from "../auth";
 
 export const openaiRouter= Router();
 const openai = new OpenAI({ baseURL: process.env.OPENAI_BASE_URL });
 
 openaiRouter.post("/parse-job", requireAuth, async(req, res) => {
-    const {text} = req.body;
+    const {text, resumeText} = req.body;
+    const resumeContext = resumeText
+        ? `\n\nThe candidate's resume:\n${resumeText}\n\nIn "notes", briefly mention how well their background fits this role.`
+        : "";
     const completion = await openai.chat.completions.create( {
     model: "claude-haiku-4-5-20251001",
     messages : [
-        {role : "system", content : "Extract structured data from job postings. Respond with ONLY a raw JSON object, no markdown code fences, no explanation, matching this exact shape: { \"company\": string, \"role\": string, \"status\": \"applied\", \"notes\": string }. \"notes\" should be a 1-2 sentence summary of the role."},
-        {role : "user", content : text},
-        ],
+            // the instructions for how the assistant should behave — the rules
+            {role : "system", content : `Extract structured data from job postings. Respond with ONLY a raw JSON object, no markdown code fences, no explanation, matching this exact shape: { "company": string, "role": string, "status": "applied", "notes": string }. "notes" should be a 1-2 sentence summary of the role.${resumeContext}`},
+            // e actual content/material being acted on
+            {role : "user", content : text},
+            ],
     });
 
     const content = completion.choices[0].message.content;
