@@ -26,12 +26,14 @@ function SigninPage() {
     }
 
     return (
-        <>
-            <LoginForm email={loginEmail} setEmail={setLoginEmail} password ={loginPassword} handleLogin={handleLogin} setPassword={setLoginPassword}  error = {loginError}/>
-            
-            <span>Don't have an account? </span>
-            <Link to="/signup">Sign Up</Link>
-        </>
+        <div className="page">
+            <div className="brand">AI Job Tracker</div>
+            <h2 className="section-title">Welcome back</h2>
+            <div className="card">
+                <LoginForm email={loginEmail} setEmail={setLoginEmail} password={loginPassword} handleLogin={handleLogin} setPassword={setLoginPassword} error={loginError} />
+            </div>
+            <p className="muted">Don't have an account? <Link className="link" to="/signup">Sign up</Link></p>
+        </div>
     )
 }
 

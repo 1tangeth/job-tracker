@@ -13,14 +13,16 @@ type LoginProps = {
 export default function LoginForm({email, setEmail, password, setPassword, handleLogin, error} : LoginProps) {
     return (
         <>
-            <FormField id="email-input" label="Enter email:" value={email}
-                onChange={setEmail} placeholder='type email' />
-            <FormField id="password-input" label="Enter password:" type= "password" value={password}
-                onChange={setPassword} placeholder='type password' />
-            <button onClick={handleLogin}>
-                Sign-in
-            </button>
-            <p>{error}</p>
+            <FormField id="email-input" label="Email" value={email}
+                onChange={setEmail} placeholder='you@example.com' />
+            <FormField id="password-input" label="Password" type="password" value={password}
+                onChange={setPassword} placeholder='••••••••' />
+            <div className="btn-row">
+                <button className="btn" onClick={handleLogin}>
+                    Sign in
+                </button>
+            </div>
+            {error && <p className="error-text">{error}</p>}
         </>
 
     )

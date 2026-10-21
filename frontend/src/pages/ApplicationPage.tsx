@@ -30,11 +30,16 @@ function ApplicationPage() {
 
     const [appError, setAppError] = useState("");
     const navigate = useNavigate();
-    
+
     useEffect(() => {
         if (!token)
             navigate("/signin")
     } , []); // [] means only run once for this page
+
+    function handleLogout() {
+        localStorage.removeItem("token");
+        navigate("/signin");
+    }
 
     async function submitApp() {
         const response = await fetch("http://localhost:3000/applications", {
@@ -111,18 +116,18 @@ function ApplicationPage() {
                 "Content-Type" : "application/json",
                 "Authorization" : `Bearer ${token}`,
             },
-            body: 
+            body:
                 JSON.stringify({
                     text: jobText
                 })
         });
-        
+
         const data = await response.json();
         if (!response.ok) {
             setAppError(data.error || "Something went wrong");
             setParsing(false);
             return;
-        }  
+        }
 
 
         setCompany(data.company);
@@ -147,66 +152,88 @@ function ApplicationPage() {
 
 
     return (
-        <> 
-        {token && (
         <>
-          <FormField id="company-input" label="Enter company name:" value={company} onChange={setCompany} placeholder="type company name" />
-          <FormField id="role-input" label="Enter role name:" value={role} onChange={setRole} placeholder="type role name" />
-          <FormField id="status-input" label="Enter status:" value={status} onChange={setStatus} placeholder="type status" />
-          <FormField id="notes-input" label="Enter notes:" value={notes} onChange={setNotes} placeholder="type notes" />
+        {token && (
+        <div className="page page-wide">
+          <div className="header-row">
+            <div className="brand">AI Job Tracker</div>
+            <button className="btn btn-secondary" onClick={handleLogout}>Log out</button>
+          </div>
 
-          <button onClick={submitApp}>
-            submit
-          </button>
-          <p> {appError}</p>
+          <h2 className="section-title">Add an application</h2>
+          <div className="card">
+            <FormField id="company-input" label="Company" value={company} onChange={setCompany} placeholder="e.g. Acme Corp" />
+            <FormField id="role-input" label="Role" value={role} onChange={setRole} placeholder="e.g. Backend Engineer" />
+            <FormField id="status-input" label="Status" value={status} onChange={setStatus} placeholder="e.g. applied" />
+            <FormField id="notes-input" label="Notes" value={notes} onChange={setNotes} placeholder="Optional notes" />
+            <div className="btn-row">
+              <button className="btn" onClick={submitApp}>Submit</button>
+            </div>
+            {appError && <p className="error-text">{appError}</p>}
+          </div>
 
-          <button onClick={getApp}>
-            get Applicaitons
-          </button>
-
-          <ul>
+          <h2 className="section-title">Your applications</h2>
+          <div className="btn-row" style={{ marginBottom: 14 }}>
+            <button className="btn btn-secondary" onClick={getApp}>Refresh</button>
+          </div>
+          <ul className="list">
             {applications.map((app) => (
-              <li key={app.id}>
-                {app.company} — {app.role} — {app.status} — <button onClick={() => deleteApp(app.id)}>delete</button>
-                — <select value={app.status} onChange={(e) => patchApp(app.id, e.target.value)}>
-                  <option value="applied">applied</option>
-                  <option value="interviewing">interviewing</option>
-                  <option value="offer">offer</option>
-                  <option value="rejected">rejected</option>
-                </select>
+              <li className="list-item" key={app.id}>
+                <div className="list-item-main">
+                  <span className="list-item-title">{app.company}</span>
+                  <span className="list-item-sub">{app.role}</span>
+                </div>
+                <div className="list-item-actions">
+                  <span className={`status-badge status-${app.status}`}>{app.status}</span>
+                  <select className="select" value={app.status} onChange={(e) => patchApp(app.id, e.target.value)}>
+                    <option value="applied">applied</option>
+                    <option value="interviewing">interviewing</option>
+                    <option value="offer">offer</option>
+                    <option value="rejected">rejected</option>
+                  </select>
+                  <button className="btn btn-danger" onClick={() => deleteApp(app.id)}>Delete</button>
+                </div>
               </li>
             ))}
           </ul>
 
-          <textarea value={jobText} onChange={(e) => setJobText(e.target.value)} placeholder="Paste job posting here..." />
-            {!parsing && (
-                <button onClick={parseJob}>Parse with AI</button>
-            )}
-            {!parsingJob && (
-                <button onClick={getJobs}>Browse Jobs</button>
-            )}
-            
-            <ul>
+          <hr className="divider" />
+
+          <h2 className="section-title">Parse a job posting</h2>
+          <div className="card">
+            <textarea className="input" value={jobText} onChange={(e) => setJobText(e.target.value)} placeholder="Paste a job posting here..." />
+            <div className="btn-row">
+              <button className="btn" onClick={parseJob} disabled={parsing}>{parsing ? "Parsing..." : "Parse with AI"}</button>
+            </div>
+          </div>
+
+          <h2 className="section-title">Browse jobs</h2>
+          <div className="btn-row" style={{ marginBottom: 14 }}>
+            <button className="btn btn-secondary" onClick={getJobs} disabled={parsingJob}>{parsingJob ? "Loading..." : "Browse Jobs"}</button>
+          </div>
+          <ul className="list">
             {jobs.map((job) => (
-                <li key={job.id}>
-                <strong>{job.company}</strong> — {job.position}{" "}
-                <button onClick = {() => {
-                    setCompany(job.company);
-                    setRole(job.position);
-                    setStatus("applied");
-                    setNotes(job.tags.join(", ")); // [python, backend, senior] => "python, backend,"
-                }} > Fill Form</button>{" "};
-                <a href={job.url} target="_blank" rel="noopener noreferrer">view</a>
-                </li>
+              <li className="list-item" key={job.id}>
+                <div className="list-item-main">
+                  <span className="list-item-title">{job.company}</span>
+                  <span className="list-item-sub">{job.position}</span>
+                </div>
+                <div className="list-item-actions">
+                  <button className="btn btn-secondary" onClick={() => {
+                      setCompany(job.company);
+                      setRole(job.position);
+                      setStatus("applied");
+                      setNotes(job.tags.join(", ")); // [python, backend, senior] => "python, backend,"
+                  }}>Fill Form</button>
+                  <a className="link" href={job.url} target="_blank" rel="noopener noreferrer">View</a>
+                </div>
+              </li>
             ))}
-            </ul>
-
-
-
-        </>
+          </ul>
+        </div>
       )}
 
-        </>
+    </>
     )
 }
 

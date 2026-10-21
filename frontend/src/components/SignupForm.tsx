@@ -13,17 +13,16 @@ type SignupProps = {
 export default function SignupForm({email, setEmail, password, setPassword, handleSignup, error} : SignupProps) {
     return (
         <>
-            <FormField id="signup-email-input" label="Enter email:" value={email}
-                onChange={setEmail} placeholder='type email' />
-            <FormField id="signup-password-input" label="Enter password:" type= "password" value={password}
-                onChange={setPassword} placeholder='type password' />
-            <button onClick={handleSignup} >
-                SignUp
-            </button>
-            <p>{error}</p>
+            <FormField id="signup-email-input" label="Email" value={email}
+                onChange={setEmail} placeholder='you@example.com' />
+            <FormField id="signup-password-input" label="Password" type="password" value={password}
+                onChange={setPassword} placeholder='••••••••' />
+            <div className="btn-row">
+                <button className="btn" onClick={handleSignup}>
+                    Sign up
+                </button>
+            </div>
+            {error && <p className="error-text">{error}</p>}
         </>
-
-
     )
-
 }

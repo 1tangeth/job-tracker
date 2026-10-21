@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import SignupForm from '../components/SignupForm';
-import {useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 function SignupPage() {
@@ -28,9 +28,14 @@ function SignupPage() {
   }
 
     return (
-        <> 
-            <SignupForm email={signupEmail} setEmail={setSignupEmail} password ={signupPassword} handleSignup={handleSignup} setPassword={setSignupPassword} error = {signupError}/>
-        </>
+        <div className="page">
+            <div className="brand">AI Job Tracker</div>
+            <h2 className="section-title">Create your account</h2>
+            <div className="card">
+                <SignupForm email={signupEmail} setEmail={setSignupEmail} password={signupPassword} handleSignup={handleSignup} setPassword={setSignupPassword} error={signupError} />
+            </div>
+            <p className="muted">Already have an account? <Link className="link" to="/signin">Sign in</Link></p>
+        </div>
     )
 }
 
